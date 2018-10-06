@@ -1,0 +1,108 @@
+a {
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+    padding: 10px;
+    margin: 0px;
+}
+
+.container {
+    display:flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    flex:1;
+    background-color: #123456;
+}
+
+.header .title {
+    margin: auto 0 auto 200px;
+    color: #ffffff;
+}
+
+.header .button {
+    padding: 10px 20px 10px 20px;
+    font-size: 15px;
+    background-color: red;
+}
+
+.header .login {
+    margin: auto 200px auto 0;
+}
+
+.header .logout {
+    margin: auto 200px auto 0;
+}
+
+.content {
+    flex:5;
+    align-items: row;
+    background-color: #dddddd;
+}
+
+.content .subcontent {
+    display: flex;
+    flex-direction: row;
+    height: 400px;
+    margin: 50px 200px 0 200px;
+    background-color: #ffffff;
+}
+
+.content .subcontent .head {
+    flex: 1;
+    padding: 10px;
+}
+
+.content .subcontent h2 {
+    margin: 0px;
+}
+
+.content .subcontent .list {
+    flex: 9;
+}
+
+.content .subcontent .category {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 10px;
+}
+
+.content .subcontent .division {
+    height: 90%;
+    align-self: center;
+    border-left: thin solid #eeeeee;
+}
+
+.content .subcontent .item {
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+    padding: 10px;
+}
+
+.content .subcontent .mainlink {
+    color: #ff0000;
+}
+
+.content .subcontent .sublink {
+    color: #999999;
+}
+
+.content .subcontent .detail {
+    padding: 10px;
+}
+
+.content .subcontent .secret {
+    flex: 1;
+    color: #ff0000;
+    padding: 10px;
+}
