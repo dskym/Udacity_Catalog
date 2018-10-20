@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_setup import Base, Category, Item
+from database_setup import Base, Category, Item, User
 
-engine = create_engine('sqlite:///catagory.db')
+engine = create_engine('sqlite:///category.db')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine
@@ -17,6 +17,10 @@ DBSession = sessionmaker(bind=engine)
 # revert all of them back to the last commit by calling
 # session.rollback()
 session = DBSession()
+
+user = User(user_id="dskym0@gmail.com")
+session.add(user)
+session.commit()
 
 # Initialize Category list.
 categoryList = ['Soccer', 'Basketball', 'Baseball', 'Frisbee',
@@ -34,61 +38,61 @@ for category in categoryList:
 
 # Insert item data into item table.
 tempItem = Item(title="Soccer1",
-                description="Soccer Item Description 1", category=categories['Soccer'])
+                description="Soccer Item Description 1", category=categories['Soccer'], user=user)
 session.add(tempItem)
 session.commit()
 
 tempItem = Item(title="Soccer2",
-                description="Soccer Item Description 2", category=categories['Soccer'])
+                description="Soccer Item Description 2", category=categories['Soccer'], user=user)
 session.add(tempItem)
 session.commit()
 
 tempItem = Item(title="Soccer3",
-                description="Soccer Item Description 3", category=categories['Soccer'])
+                description="Soccer Item Description 3", category=categories['Soccer'], user=user)
 session.add(tempItem)
 session.commit()
 
 
 tempItem = Item(title="Basketball1",
-                description="Basketball Item Description 1", category=categories['Basketball'])
+                description="Basketball Item Description 1", category=categories['Basketball'], user=user)
 session.add(tempItem)
 session.commit()
 
 tempItem = Item(title="Basketball2",
-                description="Basketball Item Description 2", category=categories['Basketball'])
+                description="Basketball Item Description 2", category=categories['Basketball'], user=user)
 session.add(tempItem)
 session.commit()
 tempItem = Item(title="Basketball3",
-                description="Basketball Item Description 3", category=categories['Basketball'])
+                description="Basketball Item Description 3", category=categories['Basketball'], user=user)
 session.add(tempItem)
 session.commit()
 
 
 tempItem = Item(title="Baseball1",
-                description="Baseball Item Description 1", category=categories['Baseball'])
+                description="Baseball Item Description 1", category=categories['Baseball'], user=user)
 session.add(tempItem)
 session.commit()
 
 tempItem = Item(title="Baseball2",
-                description="Baseball Item Description 2", category=categories['Baseball'])
+                description="Baseball Item Description 2", category=categories['Baseball'], user=user)
 session.add(tempItem)
 session.commit()
 tempItem = Item(title="Basketball3",
-                description="Baseball Item Description 3", category=categories['Baseball'])
+                description="Baseball Item Description 3", category=categories['Baseball'], user=user)
 session.add(tempItem)
 session.commit()
 
 
 tempItem = Item(title="Frisbee1",
-                description="Frisbee Item Description 1", category=categories['Frisbee'])
+                description="Frisbee Item Description 1", category=categories['Frisbee'], user=user)
 session.add(tempItem)
 session.commit()
 
 tempItem = Item(title="Frisbee2",
-                description="Frisbee Item Description 2", category=categories['Frisbee'])
+                description="Frisbee Item Description 2", category=categories['Frisbee'], user=user)
 session.add(tempItem)
 session.commit()
 tempItem = Item(title="Frisbee3",
-                description="Frisbee Item Description 3", category=categories['Frisbee'])
+                description="Frisbee Item Description 3", category=categories['Frisbee'], user=user)
 session.add(tempItem)
 session.commit()

@@ -7,6 +7,13 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+#User Table
+class User(Base) :
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(String(100), nullable=False, unique=True)
+
 # Category Table
 class Category(Base) :
     __tablename__ = 'category'
@@ -30,6 +37,8 @@ class Item(Base) :
     description = Column(String(200))
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self) :
@@ -40,6 +49,6 @@ class Item(Base) :
             'title' : self.title
         }
 
-engine = create_engine('sqlite:///catagory.db')
+engine = create_engine('sqlite:///category.db')
 
 Base.metadata.create_all(engine)

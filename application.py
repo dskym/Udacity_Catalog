@@ -10,7 +10,7 @@ from flask import (
 from sqlalchemy import create_engine
 from sqlalchemy import and_
 from sqlalchemy.orm import sessionmaker, scoped_session
-from database_setup import Base, Category, Item
+from database_setup import Base, Category, Item, User
 
 from flask import session as login_session
 import random
@@ -23,6 +23,8 @@ import json
 from flask import make_response
 import requests
 
+from functools import wraps
+
 
 app = Flask(__name__)
 
@@ -30,11 +32,21 @@ CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Test"
 
-engine = create_engine('sqlite:///catagory.db?check_same_thread=False')
+engine = create_engine('sqlite:///category.db?check_same_thread=False')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' in login_session:
+            return f(*args, **kwargs)
+        else:
+            return redirect('/login')
+    return decorated_function
 
 
 # print JSON Response.
@@ -50,6 +62,7 @@ def categoryJSON():
 
     return jsonify(Category=jsonData)
 
+
 @app.route('/<categoryName>.json')
 def itemJSON(categoryName):
     categoryId = session.query(Category).filter_by(name=categoryName).one().id
@@ -58,6 +71,18 @@ def itemJSON(categoryName):
     jsonData = [item.serialize for item in items]
 
     return jsonify(Item=jsonData)
+
+
+@app.route('/<categoryName>/<itemTitle>.json')
+def eachJSON(categoryName, itemTitle):
+    categoryByName = session.query(Category).filter_by(name=categoryName).one()
+
+    itemByTitle = session.query(Item).filter(
+            and_(Item.category_id == categoryByName.id,
+                 Item.title == itemTitle)).one()
+
+    return jsonify(Item=itemByTitle.serialize)
+
 
 # print Default Page.
 @app.route('/')
@@ -107,23 +132,26 @@ def showItem(categoryName, itemTitle):
 
 # Add Item.
 @app.route('/catalog/add', methods=['GET', 'POST'])
+@login_required
 def addItem():
-    if username not in login_session:
-        return redirect(url_for('default'))
-
     categories = session.query(Category).all()
 
     if request.method == 'POST':
         data = request.form
 
+        userObject = session.query(User).filter_by(
+            user_id=login_session['email']).one()
+
         categoryObject = session.query(Category).filter_by(
             name=data['category']).one()
 
         item = Item(title=data['title'],
-                    description=data['description'], category=categoryObject)
+                    description=data['description'],
+                    category=categoryObject, user=userObject)
 
         session.add(item)
         session.commit()
+
         return redirect(url_for('default'))
     else:
         return render_template('addItem.html', categories=categories)
@@ -131,11 +159,14 @@ def addItem():
 
 # Edit Item.
 @app.route('/catalog/<item>/edit', methods=['POST', 'GET'])
+@login_required
 def editItem(item):
-    if username not in login_session:
-        return redirect(url_for('default'))
     categories = session.query(Category).all()
     itemToEdit = session.query(Item).filter_by(title=item).one()
+    userId = session.query(User).filter_by(id=itemToEdit.user_id).one()
+
+    if userId.user_id != login_session['email']:
+        return redirect(url_for('default'))
 
     if request.method == 'POST':
         data = request.form
@@ -159,11 +190,13 @@ def editItem(item):
 
 # Delete Item.
 @app.route('/catalog/<item>/delete', methods=['GET', 'POST'])
+@login_required
 def deleteItem(item):
-    if username not in login_session:
-        return redirect(url_for('default'))
-
     itemToDelete = session.query(Item).filter_by(title=item).one()
+    userId = session.query(User).filter_by(id=itemToEdit.user_id).one()
+
+    if userId.user_id != login_session['email']:
+        return redirect(url_for('default'))
 
     if request.method == 'POST':
         session.delete(itemToDelete)
@@ -262,6 +295,13 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    users = session.query(User).all()
+
+    if login_session['email'] not in users:
+        user = User(user_id=login_session['email'])
+        session.add(user)
+        session.commit()
+
     return render_template('main.html', login_session=login_session)
 
 
@@ -288,13 +328,6 @@ def logout():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-
-        categories = session.query(Category).all()
-        rows = []
-
-        for item, category in session.query(Item, Category). \
-                filter(Item.category_id == Category.id).all():
-            rows.append((item, category))
 
         return redirect(url_for('default'))
     else:
