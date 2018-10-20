@@ -9,7 +9,7 @@ Base = declarative_base()
 
 #User Table
 class User(Base) :
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     user_id = Column(String(100), nullable=False, unique=True)
@@ -37,7 +37,7 @@ class Item(Base) :
     description = Column(String(200))
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship(User)
 
     @property
@@ -49,6 +49,6 @@ class Item(Base) :
             'title' : self.title
         }
 
-engine = create_engine('sqlite:///category.db')
+engine = create_engine('postgresql://catalog:password@localhost/catalog')
 
 Base.metadata.create_all(engine)
